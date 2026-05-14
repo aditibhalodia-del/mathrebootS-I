@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA – Math Reboot: Practice Test</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --navy:#0f2556;--navy2:#1a3a7c;--navy3:#2851a3;
+    --gold:#e8a020;--green:#1a7a3c;--red:#b91c1c;
+    --purple:#7c3aed;--gray:#9ca3af;--lightbg:#f3f4f8;
+    --border:#d1d5db;--text:#1e293b;--subtext:#64748b;
+    --s1:#1a7a3c;--s2:#7c3aed;--s3:#0f2556;
+  }
+  html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--lightbg);color:var(--text);font-size:14px}
+
+  /* HEADER */
+  .header{background:var(--navy);color:white;display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:52px;position:fixed;top:0;left:0;right:0;z-index:200;border-bottom:3px solid var(--gold)}
+  .logo{font-size:18px;font-weight:700;color:white}.logo span{color:var(--gold)}
+  .header-center{display:flex;align-items:center;gap:12px}
+  .section-badge{background:var(--navy3);padding:4px 12px;border-radius:4px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+  .header-info{font-size:11px;color:#aac}
+  .timer-wrap{display:flex;align-items:center;gap:8px}
+  .timer-label{font-size:11px;color:#99b;letter-spacing:1px;text-transform:uppercase}
+  .timer{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:500;color:#fff;background:var(--navy2);border:1.5px solid #4466aa;padding:3px 14px;border-radius:6px;min-width:90px;text-align:center;letter-spacing:2px}
+  .timer.warning{color:var(--gold);border-color:var(--gold);animation:pulse 1s ease-in-out infinite}
+  .timer.danger{color:#ff6b6b;border-color:#ff6b6b;animation:pulse 0.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+  .header-student{font-size:11px;color:#ccddff;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* TABS */
+  .section-tabs{position:fixed;top:52px;left:0;right:0;z-index:190;background:var(--navy2);display:flex;align-items:center;padding:6px 18px;gap:4px;border-bottom:1px solid #2a4a9a}
+  .tab{padding:5px 14px;border-radius:4px 4px 0 0;font-size:11.5px;font-weight:600;cursor:pointer;color:#99b;background:transparent;border:none}
+  .tab.active{background:white;color:var(--navy)}
+  .q-counter{margin-left:auto;font-size:12px;color:#aac}
+
+  /* LAYOUT */
+  .main{display:flex;height:100vh;padding-top:90px;padding-bottom:56px}
+  .question-panel{flex:1;overflow-y:auto;background:white;border-right:1px solid var(--border)}
+  .question-inner{padding:20px 26px}
+
+  /* DATA BOX */
+  .data-box{background:#f0f4ff;border:1px solid #c8d8f8;border-left:4px solid var(--navy3);border-radius:6px;padding:14px 16px;margin-bottom:14px;font-size:13.5px;line-height:1.8}
+  .data-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy3);margin-bottom:8px}
+
+  /* MATH */
+  .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 8px}
+  .frac .num{border-bottom:2px solid var(--navy3);padding:2px 10px 4px;text-align:center;white-space:nowrap;font-family:'IBM Plex Mono',monospace}
+  .frac .den{padding:4px 10px 2px;text-align:center;white-space:nowrap;font-family:'IBM Plex Mono',monospace}
+  .math-center{display:flex;justify-content:center;margin:12px 0;font-size:16px}
+  sup{font-size:0.7em;vertical-align:super;line-height:0}
+
+  /* QUESTION META */
+  .q-meta{display:flex;align-items:center;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+  .q-num-label{font-size:14px;font-weight:700;color:var(--navy)}
+  .badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:600}
+  .badge-tita{background:#fff3e0;color:#c45000}
+  .badge-mcq{background:#e0eaff;color:var(--navy3)}
+  .badge-s1{background:#e8f5ee;color:var(--s1)}
+  .badge-s2{background:#f3e8ff;color:var(--s2)}
+  .badge-s3{background:#e0eaff;color:var(--s3)}
+  .q-text{font-size:14px;line-height:1.78;margin-bottom:8px;font-weight:500;color:var(--text)}
+  .instr{background:#f0f4ff;border:1px solid #c8d8f8;border-radius:5px;padding:8px 12px;font-size:12px;color:#2a4a9a;margin-bottom:12px;line-height:1.5}
+  .hint-box{background:#fffbf0;border:1px solid #f0e0a0;border-radius:5px;padding:9px 13px;font-size:12px;color:#b07000;margin-top:16px;line-height:1.5}
+
+  /* OPTIONS */
+  .options{list-style:none;display:flex;flex-direction:column;gap:7px;margin-top:4px}
+  .option{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;transition:border-color 0.15s,background 0.15s;font-size:13.5px;line-height:1.65;user-select:none}
+  .option:hover{border-color:var(--navy3);background:#f0f4ff}
+  .option.selected{border-color:var(--navy3);background:#e8eeff}
+  .opt-radio{width:16px;height:16px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:border-color 0.15s}
+  .option.selected .opt-radio{border-color:var(--navy3)}
+  .opt-dot{width:8px;height:8px;border-radius:50%;background:var(--navy3);display:none}
+  .option.selected .opt-dot{display:block}
+  .opt-label{font-weight:600;color:var(--navy3);margin-right:4px;flex-shrink:0}
+
+  /* TITA */
+  .tita-wrap{margin-top:10px}
+  .tita-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--subtext);margin-bottom:8px}
+  .tita-input{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:700;letter-spacing:6px;text-align:center;border:2.5px solid var(--navy3);border-radius:8px;padding:12px 20px;width:220px;color:var(--navy);background:#f8f9ff;display:block;transition:border-color 0.15s,box-shadow 0.15s}
+  .tita-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,160,32,0.2)}
+  .tita-hint{font-size:11px;color:var(--subtext);margin-top:6px}
+
+  /* RIGHT PANEL */
+  .right-panel{width:226px;background:#f8f9fc;border-left:1px solid var(--border);overflow-y:auto;padding:12px;flex-shrink:0}
+  .right-panel::-webkit-scrollbar{width:5px}
+  .right-panel::-webkit-scrollbar-thumb{background:#c0c8d8;border-radius:3px}
+  .scoring-info{background:white;border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:12px}
+  .si-title{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--subtext);margin-bottom:7px}
+  .si-row{display:flex;justify-content:space-between;font-size:12px;padding:2px 0}
+  .si-row .si-v{font-weight:700}
+  .si-row.green .si-v{color:var(--green)}
+  .si-row.red .si-v{color:var(--red)}
+  .tita-note{font-size:10.5px;color:#aab;margin-top:6px;line-height:1.4}
+
+  .palette-title{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--subtext);margin-bottom:8px}
+  .palette-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:14px}
+  .pb{width:32px;height:32px;border:none;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;color:white;transition:transform 0.1s;position:relative}
+  .pb:hover{transform:scale(1.1)}
+  .pb.p-current{box-shadow:0 0 0 3px var(--gold);z-index:1}
+  .pb.p-nv{background:#9ca3af}
+  .pb.p-na{background:#ef4444}
+  .pb.p-ans{background:#16a34a}
+  .pb.p-mrv{background:var(--purple)}
+  .pb.p-amrv{background:var(--purple);border:2px solid #16a34a}
+
+  .legend{margin-bottom:12px}
+  .leg-item{display:flex;align-items:center;gap:7px;margin:4px 0;font-size:11px;color:var(--subtext)}
+  .leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+
+  .sect-jump{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+  .sj-btn{padding:4px 10px;border:1.5px solid var(--border);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;color:var(--subtext);background:white;transition:all 0.15s}
+  .sj-btn:hover,.sj-btn.active{background:var(--navy3);color:white;border-color:var(--navy3)}
+
+  /* BOTTOM NAV */
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:#eef0f5;border-top:1px solid var(--border);padding:9px 16px;display:flex;justify-content:space-between;align-items:center}
+  .nav-left,.nav-right{display:flex;gap:8px}
+  .btn{padding:7px 15px;border:none;border-radius:5px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:opacity 0.15s,transform 0.1s}
+  .btn:hover{opacity:0.88;transform:translateY(-1px)}
+  .btn-prev{background:#64748b;color:white}
+  .btn-mark{background:var(--purple);color:white}
+  .btn-clear{background:#f97316;color:white}
+  .btn-save{background:var(--green);color:white}
+  .btn-submit{background:var(--navy);color:white;border:2px solid var(--gold)}
+
+  /* MODALS */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:500;justify-content:center;align-items:center}
+  .overlay.show{display:flex}
+  .modal-box{background:white;border-radius:12px;padding:28px 32px;max-width:680px;width:94%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+  .modal-box::-webkit-scrollbar{width:6px}
+  .modal-box::-webkit-scrollbar-thumb{background:#c0c8d8;border-radius:3px}
+  .modal-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:5px;text-align:center}
+  .modal-sub{font-size:13px;color:var(--subtext);text-align:center;margin-bottom:20px}
+  .score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+  .score-card{background:var(--lightbg);border-radius:8px;padding:14px 10px;text-align:center;border:1px solid var(--border)}
+  .sc-label{font-size:10px;color:var(--subtext);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+  .sc-val{font-size:26px;font-weight:700;line-height:1}
+  .sc-val.v-blue{color:var(--navy3)}.sc-val.v-green{color:var(--green)}.sc-val.v-red{color:var(--red)}.sc-val.v-gold{color:var(--gold)}
+  .sep{height:1px;background:var(--border);margin:14px 0}
+  .analysis-title{font-size:14px;font-weight:700;color:var(--navy);margin:16px 0 10px}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{background:var(--navy);color:white;padding:8px 10px;text-align:center;font-weight:600;font-size:11px}
+  td{padding:7px 10px;text-align:center;border-bottom:1px solid #f0f0f0}
+  tr:nth-child(even) td{background:#f8f9fc}
+  .review-q{padding:12px 0;border-bottom:1px solid #f0f0f0}
+  .rq-header{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .rq-num{font-weight:700;font-size:12px;color:var(--navy3)}
+  .rq-status{font-size:11px;margin-left:auto;font-weight:600}
+  .rq-status.correct{color:var(--green)}.rq-status.wrong{color:var(--red)}.rq-status.skip{color:var(--gray)}
+  .rq-ans{font-size:12.5px;margin-top:4px}
+  .rq-your{color:#555}.rq-correct{color:var(--green);font-weight:600}
+  .confirm-box{background:white;border-radius:12px;padding:28px;max-width:380px;text-align:center}
+  .confirm-box h3{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:10px}
+  .confirm-box p{font-size:13px;color:var(--subtext);margin-bottom:8px;line-height:1.6}
+  .confirm-stats{background:var(--lightbg);border-radius:6px;padding:12px;margin:12px 0;font-size:13px;display:flex;flex-direction:column;gap:4px}
+  .cs-row{display:flex;justify-content:space-between}
+  .confirm-btns{display:flex;gap:10px;margin-top:16px;justify-content:center}
+  .btn-cancel{background:#e5e7eb;color:var(--text)}
+  .btn-confirm-sub{background:var(--navy);color:white;border:2px solid var(--gold)}
+  .timeup-box{background:white;border-radius:12px;padding:32px;max-width:360px;text-align:center}
+  .timeup-box h2{font-size:22px;font-weight:700;color:var(--red);margin-bottom:8px}
+  .timeup-box p{color:var(--subtext);font-size:13px;margin-bottom:20px}
+  .rtabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .rtab{padding:6px 14px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:white;color:var(--subtext)}
+  .rtab.active{background:var(--navy);color:white;border-color:var(--navy)}
+  .btn-review-close{background:var(--navy);color:white;width:100%;margin-top:16px;padding:10px;font-size:13px;border-radius:6px;border:none;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-weight:600}
+
+  /* ENTRY */
+  .entry-overlay{position:fixed;inset:0;background:linear-gradient(145deg,#070f24 0%,#0f2556 55%,#1a3a7c 100%);z-index:1000;display:flex;align-items:center;justify-content:center}
+  .entry-card{background:white;border-radius:16px;padding:36px 40px;width:430px;max-width:93vw;box-shadow:0 28px 80px rgba(0,0,0,0.5)}
+  .entry-logo{font-size:21px;font-weight:700;color:var(--navy);margin-bottom:6px}
+  .entry-logo span{color:var(--gold)}
+  .entry-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:2px}
+  .entry-sub{font-size:12px;color:var(--subtext);margin-bottom:20px;line-height:1.5}
+  .entry-divider{height:1px;background:var(--border);margin-bottom:20px}
+  .entry-field{margin-bottom:13px}
+  .entry-label{display:block;font-size:10.5px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--subtext);margin-bottom:5px}
+  .entry-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-size:13.5px;font-family:'IBM Plex Sans',sans-serif;color:var(--text);background:#fff;transition:border-color 0.15s}
+  .entry-input:focus{outline:none;border-color:var(--navy3);box-shadow:0 0 0 3px rgba(40,81,163,0.15)}
+  .entry-input::placeholder{color:#b0b8c8}
+  .entry-error{color:#b91c1c;font-size:12px;font-weight:600;margin-bottom:10px;min-height:18px}
+  .entry-btn{width:100%;padding:11px;background:var(--navy);color:white;border:2px solid var(--gold);border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:background 0.15s}
+  .entry-btn:hover{background:var(--navy2)}
+  .entry-note{font-size:11px;color:var(--subtext);text-align:center;margin-top:10px;line-height:1.5}
+  .student-strip{background:var(--lightbg);border:1px solid var(--border);border-radius:7px;padding:9px 14px;margin-bottom:16px;font-size:12px;color:var(--subtext);display:flex;flex-wrap:wrap;gap:6px 18px}
+  .student-strip strong{color:var(--navy);font-weight:700}
+  .submit-toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:#1a7a3c;color:white;padding:8px 22px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;transition:opacity 0.4s;z-index:800;pointer-events:none;white-space:nowrap}
+  .submit-toast.show{opacity:1}
+  .submit-toast.error{background:#b91c1c}
+</style>
+</head>
+<body>
+
+<!-- ENTRY -->
+<div class="entry-overlay" id="entry-overlay">
+  <div class="entry-card">
+    <div class="entry-logo">QA <span>Math Reboot</span></div>
+    <div class="entry-title">Indices, Surds &amp; Set Theory: Practice Test</div>
+    <div class="entry-sub">Fill in your details. The 60-minute timer starts only after you click <strong>Begin Test</strong>.</div>
+    <div class="entry-divider"></div>
+    <div class="entry-field"><label class="entry-label">Student Name *</label><input class="entry-input" id="inp-name" type="text" placeholder="Your full name" autocomplete="off"/></div>
+    <div class="entry-field"><label class="entry-label">Center *</label><input class="entry-input" id="inp-center" type="text" placeholder="e.g. IMS Ahmedabad" autocomplete="off"/></div>
+    <div class="entry-field"><label class="entry-label">Batch *</label><input class="entry-input" id="inp-batch" type="text" placeholder="e.g. CAT 26 · 2701" autocomplete="off"/></div>
+    <div class="entry-error" id="entry-error"></div>
+    <button class="entry-btn" onclick="startTest()">Begin Test ▶</button>
+    <div class="entry-note">Once you begin, the timer cannot be paused.</div>
+  </div>
+</div>
+
+<div class="submit-toast" id="submit-toast"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">QA <span>Math Reboot</span> <span style="font-size:12px;font-weight:400;color:#aac;">· Practice</span></div>
+  <div class="header-center">
+    <div class="section-badge">QA Practice</div>
+    <div class="header-info">28 Questions &nbsp;·&nbsp; 60 Minutes &nbsp;·&nbsp; 3 Sections</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div class="header-student" id="header-student"></div>
+    <div class="timer-wrap">
+      <div class="timer-label">Time Left</div>
+      <div class="timer" id="timer">60:00</div>
+    </div>
+  </div>
+</div>
+
+<div class="section-tabs">
+  <div class="tab active" id="tab1">§1 · Indices &amp; Surds – 1 &nbsp;(Q1–7)</div>
+  <div class="tab" id="tab2">§2 · Indices &amp; Surds – 2 &nbsp;(Q8–17)</div>
+  <div class="tab" id="tab3">§3 · Set Theory &nbsp;(Q18–28)</div>
+  <div class="q-counter">Q <span id="cur-q-num">1</span> / 28</div>
+</div>
+
+<div class="main">
+  <div class="question-panel"><div class="question-inner" id="question-inner"></div></div>
+  <div class="right-panel">
+    <div class="scoring-info">
+      <div class="si-title">Marking Scheme</div>
+      <div class="si-row green"><span>Correct (any)</span><span class="si-v">+3</span></div>
+      <div class="si-row red"><span>Wrong (MCQ)</span><span class="si-v">−1</span></div>
+      <div class="si-row"><span style="color:#888">Wrong (TITA)</span><span class="si-v" style="color:#888">0</span></div>
+      <div class="si-row"><span style="color:#888">Skipped</span><span class="si-v" style="color:#888">0</span></div>
+    </div>
+    <div class="legend">
+      <div class="palette-title">Status Legend</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#9ca3af"></div>Not Visited</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div>Not Answered</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#16a34a"></div>Answered</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Marked for Review</div>
+    </div>
+    <div class="palette-title">Jump to Section</div>
+    <div class="sect-jump">
+      <button class="sj-btn" onclick="goToQ(1)">§1 Q1</button>
+      <button class="sj-btn" onclick="goToQ(8)">§2 Q8</button>
+      <button class="sj-btn" onclick="goToQ(18)">§3 Q18</button>
+    </div>
+    <div class="palette-title">Question Palette</div>
+    <div class="palette-grid" id="palette"></div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-left">
+    <button class="btn btn-prev" onclick="navigate(-1)">◀ Prev</button>
+    <button class="btn btn-mark" onclick="markForReview()">⚑ Mark</button>
+    <button class="btn btn-clear" onclick="clearResponse()">✕ Clear</button>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-save" onclick="saveAndNext()">Save &amp; Next ▶</button>
+    <button class="btn btn-submit" onclick="showConfirmSubmit()">Submit Test</button>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>Submit Test?</h3>
+    <p>You are about to submit the Math Reboot practice test.</p>
+    <div class="confirm-stats" id="confirm-stats"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-confirm-sub" onclick="submitSection()">Yes, Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIME UP -->
+<div class="overlay" id="timeup-overlay">
+  <div class="timeup-box">
+    <h2>⏱ Time's Up!</h2>
+    <p>60 minutes elapsed. Your responses are being submitted.</p>
+    <button class="btn btn-submit" style="width:100%;" onclick="submitSection()">View Results</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="overlay" id="results-overlay">
+  <div class="modal-box">
+    <div class="modal-title">📊 Math Reboot: Practice Test</div>
+    <div class="modal-sub">Results &amp; Review</div>
+    <div class="student-strip" id="student-strip"></div>
+    <div class="score-grid" id="score-cards"></div>
+    <div class="sep"></div>
+    <div class="analysis-title">Section-wise Analysis</div>
+    <table id="analysis-table"></table>
+    <div class="sep"></div>
+    <div class="analysis-title">Question-wise Review</div>
+    <div class="rtabs">
+      <button class="rtab active" onclick="filterReview('all',this)">All (28)</button>
+      <button class="rtab" onclick="filterReview('correct',this)">Correct</button>
+      <button class="rtab" onclick="filterReview('wrong',this)">Wrong</button>
+      <button class="rtab" onclick="filterReview('skip',this)">Skipped</button>
+    </div>
+    <div id="review-list"></div>
+    <button class="btn-review-close" onclick="closeResults()">Close &amp; Review Questions</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// GOOGLE FORMS CONFIG
+// Create a NEW form with 9 fields:
+// Student Name, Center, Batch,
+// Total Score, Correct, Incorrect,
+// Skipped, Time Taken, All Responses
+// ══════════════════════════════════════
+const GF_CONFIG = {
+  formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfZK_8hrmrKHdTf3WCZmLlzDIi955n-hmFYrGTCRTEQfF1Pdg/formResponse',
+  fields: {
+    studentName:'entry.789698159',
+    center     :'entry.914610642',
+    batch      :'entry.1608121846',
+    totalScore :'entry.936102364',
+    correct    :'entry.1286017929',
+    incorrect  :'entry.42989093',
+    skipped    :'entry.978415312',
+    timeTaken  :'entry.663227748',
+    responses  :'entry.243653077',
+  }
+};
+
+// ══════════════════════════════════════
+// DATA SETS (Section 3)
+// ══════════════════════════════════════
+const DATA_SETS = {
+  ds1:{
+    title:'Data for Q19 – Q21',
+    text:`In a class of <strong>80 students</strong>, 50 passed in English, 45 passed in Hindi, and 20 failed in both subjects.`
+  },
+  ds2:{
+    title:'Data for Q22 – Q25',
+    text:`Among <strong>800 people surveyed</strong>: 625 played cricket, 300 played football, 250 played hockey. 100 played <em>none</em> of the three games. 100 played <em>all three</em> games.`
+  },
+  ds3:{
+    title:'Data for Q26 – Q28',
+    text:`<strong>Set A</strong> = first 5 odd numbers = {1, 3, 5, 7, 9}<br><strong>Set B</strong> = first 5 prime numbers = {1, 2, 3, 5, 7}<br><span style="font-size:11px;color:#888">Note: 1 is treated as prime → A∩B = {1, 3, 5, 7}</span>`
+  }
+};
+
+// ══════════════════════════════════════
+// QUESTIONS
+// ══════════════════════════════════════
+const QUESTIONS = [
+  // ── SECTION 1: Indices & Surds 1 (Q1–7) ──
+  {id:1,sec:1,topic:'Indices',mcq:false,
+   text:'If M = 6561<sup>2</sup> ÷ 729<sup>2</sup>, find the value of M.',
+   answer:'81',hint:'Express 6561 and 729 as powers of 3.'},
+
+  {id:2,sec:1,topic:'Indices',mcq:false,
+   text:'If 2<sup>x</sup> = 4<sup>y</sup> = 16<sup>z</sup>, and x, y, z are the largest possible two-digit natural numbers, what is x − y − z?',
+   answer:'24',hint:'Express 4 = 2² and 16 = 2⁴. For y and z to be natural numbers, x must be divisible by 4.'},
+
+  {id:3,sec:1,topic:'Indices',mcq:false,
+   text:'Simplify the expression below. (Your answer will be a constant, independent of x.)<div class="math-center"><span class="frac"><span class="num">2<sup>x+1</sup> + 2<sup>x+2</sup> + 2<sup>x+3</sup></span><span class="den">2<sup>x</sup> + 2<sup>x+1</sup> + 2<sup>x+2</sup></span></span></div>',
+   answer:'2',hint:'Factor out 2<sup>x</sup> from numerator and denominator.'},
+
+  {id:4,sec:1,topic:'Surds',mcq:false,
+   text:'If √(24 + √432) = √P + √Q, where P > Q > 0 are positive integers, find P + Q.',
+   answer:'24',hint:'Assume = √a+√b. Then a+b = 24 and 4ab = 432. Solve for a and b.'},
+
+  {id:5,sec:1,topic:'Surds',mcq:false,
+   text:'If √(24 + √320) = P√Q + R, where P, Q and R are integers each greater than 1, find P + Q + R.',
+   answer:'9',hint:'Simplify √320 = 8√5. Then find integers P, Q, R each > 1.'},
+
+  {id:6,sec:1,topic:'Indices',mcq:false,
+   text:'If x and y are integers such that 2<sup>(x−7)</sup> + 3<sup>(y+8)</sup> = 209, find x + y.',
+   answer:'10',hint:'Try successive powers of 3. Find the pair that sums to 209 and back-solve for x and y.'},
+
+  {id:7,sec:1,topic:'Surds',mcq:false,
+   text:'If √(18 + 6√5) = √P + √Q, where P > Q > 0 are positive integers, find P + Q.',
+   answer:'18',hint:'a+b = 18 and 2√(ab) = 6√5, giving ab = 45. Solve.'},
+
+  // ── SECTION 2: Indices & Surds 2 (Q8–17) ──
+  {id:8,sec:2,topic:'Indices/Surds',mcq:false,
+   text:'If N = ∛(13 + 2√11) + ∛(13 − 2√11), find the value of N³ − 15N.',
+   answer:'26',hint:'Let a = ∛(13+2√11), b = ∛(13−2√11). Use (a+b)³ = a³+b³+3ab(a+b). Here a³+b³ = 26 and 3ab·N = 15N.'},
+
+  {id:9,sec:2,topic:'Indices',mcq:false,
+   text:'Find the value of N:<div class="math-center"><span class="frac"><span class="num">4.7³ − 2.7³</span><span class="den">22.09 + 12.69 + 7.29</span></span></div>',
+   answer:'2',hint:'Use a³−b³ = (a−b)(a²+ab+b²). The denominator is a²+ab+b² with a=4.7, b=2.7.'},
+
+  {id:10,sec:2,topic:'Indices',mcq:true,
+   text:'If M = 3<sup>x+1</sup> + 3<sup>x+2</sup> + 3<sup>x+3</sup> and x is a natural number, M is <strong>always</strong> divisible by:',
+   options:['115','117','120','125'],answer:1,
+   hint:'Factor out 3<sup>x+1</sup> → M = 3<sup>x+1</sup>(1+3+9) = 13 × 3<sup>x+1</sup>. Since x ≥ 1, check divisibility.'},
+
+  {id:11,sec:2,topic:'Indices',mcq:false,
+   text:'If 2<sup>2x+1</sup> + 4<sup>x+2</sup> = 4444 + 222 − 20 + 2, find the <strong>nearest integral value</strong> of x.<br><small style="color:#888">(RHS: treat each term as a plain number → 4444+222−20+2 = 4648)</small>',
+   answer:'4',hint:'LHS = 2·4<sup>x</sup> + 16·4<sup>x</sup> = 18·4<sup>x</sup>. RHS = 4648. Solve for x (nearest integer).'},
+
+  {id:12,sec:2,topic:'Indices',mcq:false,
+   text:'If (0.1̄)<sup>a</sup> = 324<sup>b</sup> = 2<sup>c</sup>, what is bc − ba?<br><small style="color:#888">Enter answer as decimal (e.g. 0.5)</small>',
+   answer:'0.5',hint:'0.1̄ = 1/9. Express a, b, c using logarithms. bc − ba = b(c−a).'},
+
+  {id:13,sec:2,topic:'Indices',mcq:false,
+   text:'If a<sup>x</sup> = b<sup>(y+z)</sup>, b<sup>y</sup> = c<sup>(z+x)</sup>, and c<sup>z</sup> = a<sup>(x+y)</sup>, find the value of ax + by + cz.',
+   answer:'0',hint:'Take log of each equation. Add all three and observe that the sum collapses to zero.'},
+
+  {id:14,sec:2,topic:'Surds',mcq:true,
+   text:'Which of the following is the <strong>largest</strong>?',
+   options:['√29 + √51','√21 + √59','√8 + √72','√47 + √33','√31 + √49'],answer:3,
+   hint:'All pairs sum to 80. The pair with the smallest |a−b| gives the largest √a+√b.'},
+
+  {id:15,sec:2,topic:'Surds',mcq:true,
+   text:'Which of the following is the <strong>largest</strong>?',
+   options:['√79 − √51','√81 − √53','√98 − √70','√47 − √19','√73 − √45'],answer:3,
+   hint:'All pairs have a−b = 28. So √a−√b = 28/(√a+√b). Minimise a+b to maximise the expression.'},
+
+  {id:16,sec:2,topic:'Indices',mcq:true,
+   text:'Which of the following is the <strong>largest</strong>?',
+   options:['2<sup>2<sup>2<sup>2</sup></sup></sup>','(2<sup>2</sup>)<sup>(2<sup>2</sup>)</sup>','((2<sup>2</sup>)<sup>2</sup>)<sup>2</sup>'],answer:0,
+   hint:'Right-associative: 2^(2^4) = 2^16 = 65536. Others evaluate to 4^4 = 256 and 16² = 256.'},
+
+  {id:17,sec:2,topic:'Indices',mcq:true,
+   text:'Which of the following is the <strong>largest</strong>?',
+   options:['2<sup>2<sup>3<sup>3</sup></sup></sup>','2<sup>3<sup>2<sup>3</sup></sup></sup>','3<sup>2<sup>3<sup>2</sup></sup></sup>','3<sup>3<sup>2<sup>2</sup></sup></sup>'],answer:0,
+   hint:'Top exponents: 3³=27, 2³=8, 3²=9, 2²=4. Option A has 2^(2^27) — by far the largest.'},
+
+  // ── SECTION 3: Set Theory (Q18–28) ──
+  {id:18,sec:3,dataSet:null,topic:'Set Theory',mcq:true,
+   text:'In a class, 40 students like tea and 15 like coffee. What is the minimum and maximum number of students in the class?',
+   options:['Min = 15, Max = 55','Min = 40, Max = 55','Min = 40, Max = cannot be determined','Min = 15, Max = cannot be determined'],answer:2,
+   hint:'Minimum: all coffee-likers also like tea → max(40,15) = 40. Maximum: unknown if students can like neither.'},
+
+  {id:19,sec:3,dataSet:'ds1',topic:'Set Theory',mcq:false,
+   text:'How many students passed in <em>only</em> English?',
+   answer:'15',hint:'Find |E∩H| using |E∪H| = 80−20 = 60. Then only English = |E| − |E∩H|.'},
+
+  {id:20,sec:3,dataSet:'ds1',topic:'Set Theory',mcq:false,
+   text:'How many students passed in <em>only</em> Hindi?',
+   answer:'10',hint:'Only Hindi = |H| − |E∩H|.'},
+
+  {id:21,sec:3,dataSet:'ds1',topic:'Set Theory',mcq:false,
+   text:'How many students passed in <em>both</em> subjects?',
+   answer:'35',hint:'|E∪H| = 60. Use |E|+|H|−|E∩H| = 60 → 50+45−|E∩H| = 60.'},
+
+  {id:22,sec:3,dataSet:'ds2',topic:'Set Theory',mcq:false,
+   text:'If 75 played <em>only</em> football and hockey (not cricket), how many played <em>only</em> cricket?',
+   answer:'325',hint:'Use inclusion-exclusion for 3 sets with total = 700. Only F∩H = 75 → |F∩H| = 175. Then find only cricket.'},
+
+  {id:23,sec:3,dataSet:'ds2',topic:'Set Theory',mcq:false,
+   text:'If 300 played <em>only</em> cricket, how many played <em>only</em> football and hockey (not cricket)?',
+   answer:'50',hint:'"Only cricket" formula gives |C∩F|+|C∩H| = 425. Then |F∩H| = 575−425 = 150. Only F&H = 150−100 = 50.'},
+
+  {id:24,sec:3,dataSet:'ds2',topic:'Set Theory',mcq:false,
+   text:'If all those who played football also played cricket, how many played <em>only</em> hockey?',
+   answer:'75',hint:'F⊆C → |C∩F| = |F| = 300. Find |C∩H|, then only hockey = |H|−|C∩H|−|F∩H|+100.'},
+
+  {id:25,sec:3,dataSet:'ds2',topic:'Set Theory',mcq:false,
+   text:'If 250 played both cricket and football, how many played <em>only</em> hockey?',
+   answer:'25',hint:'|C∩F| = 250 → |C∩H|+|F∩H| = 325. Only hockey = 250−325+100 = 25.'},
+
+  {id:26,sec:3,dataSet:'ds3',topic:'Set Theory',mcq:false,
+   text:'How many sets C are possible such that C is a subset of both A and B?',
+   answer:'16',hint:'C ⊆ A and C ⊆ B means C ⊆ A∩B = {1,3,5,7}. Count all subsets of A∩B = 2⁴ = 16.'},
+
+  {id:27,sec:3,dataSet:'ds3',topic:'Set Theory',mcq:false,
+   text:'How many sets C are possible such that C is a <em>proper</em> subset of both A and B?',
+   answer:'16',hint:'Since A∩B ⊊ A and A∩B ⊊ B, every subset of A∩B is automatically a proper subset of both A and B.'},
+
+  {id:28,sec:3,dataSet:'ds3',topic:'Set Theory',mcq:false,
+   text:'If D is a superset of both A and B, what is the <em>least</em> number of elements in D?',
+   answer:'6',hint:'D must contain all elements of A∪B = {1,2,3,5,7,9}. So |D|_min = |A∪B| = 6.'},
+];
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+const TOTAL_Q=28, TOTAL_SECS=60*60;
+let currentQ=1, timeLeft=TOTAL_SECS, timerInterval=null, submitted=false;
+let studentInfo={name:'',center:'',batch:''};
+const state={};
+for(let i=1;i<=TOTAL_Q;i++) state[i]={status:'nv',response:null};
+state[1].status='na';
+
+// ══════════════════════════════════════
+// ENTRY
+// ══════════════════════════════════════
+function startTest(){
+  const name=document.getElementById('inp-name').value.trim();
+  const center=document.getElementById('inp-center').value.trim();
+  const batch=document.getElementById('inp-batch').value.trim();
+  const errEl=document.getElementById('entry-error');
+  if(!name||!center||!batch){errEl.textContent='⚠ Please fill in all fields before beginning.';return;}
+  errEl.textContent='';
+  studentInfo={name,center,batch};
+  document.getElementById('entry-overlay').style.display='none';
+  document.getElementById('header-student').textContent='👤 '+name;
+  startTimer();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  ['inp-name','inp-center','inp-batch'].forEach(id=>{
+    document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')startTest();});
+  });
+});
+
+// ══════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════
+function startTimer(){
+  timerInterval=setInterval(()=>{
+    if(submitted){clearInterval(timerInterval);return;}
+    timeLeft--;updateTimerDisplay();
+    if(timeLeft<=0){clearInterval(timerInterval);document.getElementById('timeup-overlay').classList.add('show');}
+  },1000);
+}
+function updateTimerDisplay(){
+  const m=String(Math.floor(timeLeft/60)).padStart(2,'0'),s=String(timeLeft%60).padStart(2,'0');
+  const el=document.getElementById('timer');
+  el.textContent=`${m}:${s}`;el.className='timer';
+  if(timeLeft<=600&&timeLeft>120)el.classList.add('warning');
+  else if(timeLeft<=120)el.classList.add('danger');
+}
+function formatTimeTaken(){
+  const used=TOTAL_SECS-timeLeft;
+  return String(Math.floor(used/60)).padStart(2,'0')+':'+String(used%60).padStart(2,'0');
+}
+
+// ══════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════
+function secBadgeClass(sec){return['','badge-s1','badge-s2','badge-s3'][sec];}
+function secLabel(sec){return['','Indices & Surds 1','Indices & Surds 2','Set Theory'][sec];}
+
+function renderQuestion(qid){
+  const q=QUESTIONS[qid-1], s=state[qid];
+  const mcqBadge=q.mcq?'<span class="badge badge-mcq">MCQ · −1 wrong</span>':'<span class="badge badge-tita">TITA · No negative</span>';
+
+  let html=`<div class="q-meta">
+    <span class="q-num-label">Q.${q.id}</span>
+    <span class="badge ${secBadgeClass(q.sec)}">${secLabel(q.sec)}</span>
+    <span class="badge" style="background:#f1f5f9;color:#475569">${q.topic}</span>
+    ${mcqBadge}
+  </div>`;
+
+  if(q.dataSet){
+    const ds=DATA_SETS[q.dataSet];
+    html+=`<div class="data-box"><div class="data-title">📋 ${ds.title}</div>${ds.text}</div>`;
+  }
+
+  html+=`<div class="instr">📌 ${q.mcq?'Select the correct option.':'Type In The Answer — enter a number. No negative marking for TITA.'}</div>`;
+  html+=`<div class="q-text">${q.text}</div>`;
+
+  if(q.mcq){
+    const L=['A','B','C','D','E'];
+    html+='<ul class="options">'+q.options.map((opt,i)=>
+      `<li class="option${s.response===i?' selected':''}" data-idx="${i}">
+        <div class="opt-radio"><div class="opt-dot"></div></div>
+        <span><span class="opt-label">${L[i]}.</span> ${opt}</span>
+      </li>`
+    ).join('')+'</ul>';
+  } else {
+    const isDecimal=q.id===12;
+    const pattern=isDecimal?'[^0-9\\.\\-]':'[^0-9\\-]';
+    html+=`<div class="tita-wrap">
+      <div class="tita-label">Your Answer</div>
+      <input class="tita-input" id="tita-input" type="text" inputmode="${isDecimal?'decimal':'numeric'}" maxlength="8"
+        placeholder="—" value="${s.response!==null?s.response:''}">
+      <div class="tita-hint">${isDecimal?'Enter a decimal value (e.g. 0.5)':'Enter an integer'}</div>
+    </div>`;
+  }
+
+  html+=`<div class="hint-box">💡 <strong>Hint:</strong> ${q.hint}</div>`;
+
+  document.getElementById('question-inner').innerHTML=html;
+  document.getElementById('cur-q-num').textContent=qid;
+
+  // Update section tabs
+  ['tab1','tab2','tab3'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('active',q.sec===i+1);
+  });
+
+  if(q.mcq){
+    document.querySelectorAll('.option').forEach(el=>{
+      el.addEventListener('click',()=>{
+        state[currentQ].response=parseInt(el.dataset.idx);
+        state[currentQ].status=state[currentQ].status==='mrv'?'amrv':'ans';
+        renderQuestion(currentQ);updatePalette();
+      });
+    });
+  } else {
+    const inp=document.getElementById('tita-input');
+    const isDecimal=q.id===12;
+    inp.addEventListener('input',()=>{
+      let v=inp.value.replace(isDecimal?/[^0-9.\-]/g:/[^0-9\-]/g,'');
+      inp.value=v;
+      state[currentQ].response=v||null;
+      state[currentQ].status=v?(state[currentQ].status==='mrv'?'amrv':'ans'):'na';
+      updatePalette();
+    });
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')saveAndNext();});
+    inp.focus();
+  }
+  updatePalette();updateSectJump();
+}
+
+function updateSectJump(){
+  document.querySelectorAll('.sj-btn').forEach((btn,i)=>{
+    const starts=[1,8,18];
+    const ends=[7,17,28];
+    btn.classList.toggle('active',currentQ>=starts[i]&&currentQ<=ends[i]);
+  });
+}
+
+// ══════════════════════════════════════
+// PALETTE
+// ══════════════════════════════════════
+function updatePalette(){
+  document.getElementById('palette').innerHTML=Array.from({length:TOTAL_Q},(_,i)=>{
+    const n=i+1,st=state[n].status;
+    const cls={nv:'p-nv',na:'p-na',ans:'p-ans',mrv:'p-mrv',amrv:'p-amrv'}[st]||'p-nv';
+    return `<button class="pb ${cls}${n===currentQ?' p-current':''}" onclick="goToQ(${n})">${n}</button>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+function goToQ(qid){
+  if(qid<1||qid>TOTAL_Q)return;
+  if(state[currentQ].status==='nv')state[currentQ].status='na';
+  currentQ=qid;
+  if(state[currentQ].status==='nv')state[currentQ].status='na';
+  renderQuestion(currentQ);
+}
+function navigate(dir){const n=currentQ+dir;if(n>=1&&n<=TOTAL_Q){if(state[currentQ].status==='nv')state[currentQ].status='na';goToQ(n);}}
+function saveAndNext(){
+  const s=state[currentQ];
+  s.status=(s.response!==null&&s.response!=='')?((s.status==='mrv'||s.status==='amrv')?'amrv':'ans'):'na';
+  navigate(1);
+}
+function markForReview(){
+  const s=state[currentQ];
+  s.status=(s.response!==null&&s.response!=='')?'amrv':'mrv';
+  updatePalette();navigate(1);
+}
+function clearResponse(){state[currentQ].response=null;state[currentQ].status='na';renderQuestion(currentQ);updatePalette();}
+
+// ══════════════════════════════════════
+// SUBMIT
+// ══════════════════════════════════════
+function showConfirmSubmit(){
+  let ans=0,na=0,mrv=0;
+  for(let i=1;i<=TOTAL_Q;i++){
+    const st=state[i].status;
+    if(st==='ans'||st==='amrv')ans++;
+    else if(st==='mrv')mrv++;
+    else na++;
+  }
+  document.getElementById('confirm-stats').innerHTML=
+    `<div class="cs-row"><span>✅ Answered</span><span><strong>${ans}</strong></span></div>
+     <div class="cs-row"><span>❌ Not Answered</span><span><strong>${na}</strong></span></div>
+     <div class="cs-row"><span>⚑ Marked (unanswered)</span><span><strong>${mrv}</strong></span></div>`;
+  document.getElementById('confirm-overlay').classList.add('show');
+}
+function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('show');}
+function submitSection(){
+  if(submitted)return;submitted=true;clearInterval(timerInterval);
+  document.getElementById('confirm-overlay').classList.remove('show');
+  document.getElementById('timeup-overlay').classList.remove('show');
+  showResults();
+}
+
+// ══════════════════════════════════════
+// EVALUATE
+// ══════════════════════════════════════
+function evaluateQ(q){
+  const resp=state[q.id].response;
+  const has=resp!==null&&resp!==undefined&&resp!=='';
+  if(!has)return{result:'skip',marks:0};
+  if(q.mcq){
+    return resp===q.answer?{result:'correct',marks:3}:{result:'wrong',marks:-1};
+  }
+  // TITA
+  if(q.id===12){
+    const num=parseFloat(resp);
+    return Math.abs(num-0.5)<0.01?{result:'correct',marks:3}:{result:'wrong',marks:0};
+  }
+  return String(resp).trim()===String(q.answer).trim()?{result:'correct',marks:3}:{result:'wrong',marks:0};
+}
+
+// ══════════════════════════════════════
+// RESULTS
+// ══════════════════════════════════════
+function showResults(){
+  let total=0,correct=0,wrong=0,skip=0;
+  const secData=[{q:0,c:0,w:0,s:0,m:0},{q:0,c:0,w:0,s:0,m:0},{q:0,c:0,w:0,s:0,m:0}];
+
+  QUESTIONS.forEach(q=>{
+    const{result,marks}=evaluateQ(q);total+=marks;
+    const sd=secData[q.sec-1];sd.q++;sd.m+=marks;
+    if(result==='correct'){correct++;sd.c++;}
+    else if(result==='wrong'){wrong++;sd.w++;}
+    else{skip++;sd.s++;}
+  });
+  const acc=correct+wrong>0?Math.round(correct/(correct+wrong)*100):0;
+
+  document.getElementById('student-strip').innerHTML=
+    `<span>👤 <strong>${studentInfo.name||'—'}</strong></span>
+     <span>Center: <strong>${studentInfo.center||'—'}</strong></span>
+     <span>Batch: <strong>${studentInfo.batch||'—'}</strong></span>
+     <span>Time: <strong>${formatTimeTaken()}</strong></span>`;
+
+  submitToGoogleForms({total,correct,wrong,skip});
+
+  document.getElementById('score-cards').innerHTML=
+    `<div class="score-card"><div class="sc-label">Total Score</div><div class="sc-val v-blue">${total}</div><div style="font-size:10px;color:#888;margin-top:4px;">out of 84</div></div>
+     <div class="score-card"><div class="sc-label">Accuracy</div><div class="sc-val v-gold">${acc}%</div><div style="font-size:10px;color:#888;margin-top:4px;">${correct} of ${correct+wrong}</div></div>
+     <div class="score-card"><div class="sc-label">Correct</div><div class="sc-val v-green">+${correct*3}</div><div style="font-size:10px;color:#888;margin-top:4px;">${correct} questions</div></div>
+     <div class="score-card"><div class="sc-label">Negative</div><div class="sc-val v-red">−${wrong}</div><div style="font-size:10px;color:#888;margin-top:4px;">${wrong} wrong MCQ</div></div>`;
+
+  const secNames=['Indices & Surds 1','Indices & Surds 2','Set Theory'];
+  const secMax=[21,30,33];
+  document.getElementById('analysis-table').innerHTML=
+    `<tr><th>Section</th><th>Qs</th><th>Attempted</th><th>Correct</th><th>Wrong</th><th>Skipped</th><th>Score</th></tr>`+
+    secData.map((sd,i)=>
+      `<tr><td><strong>${secNames[i]}</strong></td><td>${sd.q}</td><td>${sd.c+sd.w}</td><td>${sd.c}</td><td>${sd.w}</td><td>${sd.s}</td>
+       <td style="font-weight:700;color:${sd.m>=0?'#16a34a':'#b91c1c'}">${sd.m}</td></tr>`
+    ).join('')+
+    `<tr style="background:#e0eaff"><td><strong>TOTAL</strong></td><td><strong>28</strong></td><td><strong>${correct+wrong}</strong></td><td><strong>${correct}</strong></td><td><strong>${wrong}</strong></td><td><strong>${skip}</strong></td>
+     <td style="font-weight:700;font-size:15px;color:${total>=0?'#0f2556':'#b91c1c'}">${total}</td></tr>`;
+
+  renderReviewList('all');
+  document.getElementById('results-overlay').classList.add('show');
+}
+
+function renderReviewList(filter){
+  const L=['A','B','C','D','E'];
+  let html='';
+  QUESTIONS.forEach(q=>{
+    const{result}=evaluateQ(q);
+    if(filter!=='all'&&result!==filter)return;
+    const resp=state[q.id].response;
+    const statusHtml=result==='correct'?`<span class="rq-status correct">✓ Correct (+3)</span>`:
+      result==='wrong'?(q.mcq?`<span class="rq-status wrong">✗ Wrong (−1)</span>`:`<span class="rq-status wrong">✗ Wrong (0)</span>`):
+      `<span class="rq-status skip">— Skipped (0)</span>`;
+    let ansInfo='';
+    if(q.mcq){
+      const yr=resp!==null?`${L[resp]}. ${q.options[resp].replace(/<[^>]+>/g,'')}`:'Not attempted';
+      const cr=`${L[q.answer]}. ${q.options[q.answer].replace(/<[^>]+>/g,'')}`;
+      ansInfo=`<div class="rq-ans"><span class="rq-your">Your: ${yr}</span><br><span class="rq-correct">✓ Correct: ${cr}</span></div>`;
+    } else {
+      ansInfo=`<div class="rq-ans"><span class="rq-your">Your: <strong>${resp||'Not attempted'}</strong></span>&nbsp;&nbsp;<span class="rq-correct">✓ Correct: <strong>${q.answer}</strong></span></div>`;
+    }
+    const secColors=['','background:#e8f5ee;color:#1a7a3c','background:#f3e8ff;color:#7c3aed','background:#e0eaff;color:#0f2556'];
+    html+=`<div class="review-q">
+      <div class="rq-header">
+        <span class="rq-num">Q.${q.id}</span>
+        <span style="font-size:10px;padding:1px 6px;border-radius:8px;font-weight:600;${secColors[q.sec]}">${q.topic}</span>
+        ${statusHtml}
+      </div>
+      <div style="font-size:13px;color:var(--text);line-height:1.5;margin-bottom:4px;">${q.text.replace(/<[^>]+>/g,'').substring(0,100)}${q.text.replace(/<[^>]+>/g,'').length>100?'...':''}</div>
+      ${ansInfo}
+    </div>`;
+  });
+  if(!html)html='<div style="padding:20px;text-align:center;color:#999;">No questions in this category.</div>';
+  document.getElementById('review-list').innerHTML=html;
+}
+
+function filterReview(f,btn){document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderReviewList(f);}
+function closeResults(){document.getElementById('results-overlay').classList.remove('show');}
+
+// ══════════════════════════════════════
+// GOOGLE FORMS
+// ══════════════════════════════════════
+function showToast(msg,isError=false){
+  const t=document.getElementById('submit-toast');
+  t.textContent=msg;t.className='submit-toast'+(isError?' error':'')+' show';
+  setTimeout(()=>t.classList.remove('show'),4000);
+}
+function buildResponseString(){
+  const L=['A','B','C','D','E'];
+  return QUESTIONS.map(q=>{
+    const resp=state[q.id].response;
+    const has=resp!==null&&resp!==undefined&&resp!=='';
+    if(!has)return`Q${q.id}:–`;
+    const{result}=evaluateQ(q);
+    if(q.mcq)return`Q${q.id}:${L[resp]}(${result==='correct'?'✓':'✗'})`;
+    return`Q${q.id}:${resp}(${result==='correct'?'✓':'✗'})`;
+  }).join('  ');
+}
+async function submitToGoogleForms(scoreData){
+  if(GF_CONFIG.formUrl.includes('YOUR_NEW_FORM_ID_HERE')){console.warn('Google Forms not configured.');return;}
+  const f=GF_CONFIG.fields,params=new URLSearchParams();
+  params.append(f.studentName,studentInfo.name);
+  params.append(f.center,studentInfo.center);
+  params.append(f.batch,studentInfo.batch);
+  params.append(f.totalScore,scoreData.total);
+  params.append(f.correct,scoreData.correct);
+  params.append(f.incorrect,scoreData.wrong);
+  params.append(f.skipped,scoreData.skip);
+  params.append(f.timeTaken,formatTimeTaken());
+  params.append(f.responses,buildResponseString());
+  try{
+    await fetch(GF_CONFIG.formUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:params.toString()});
+    showToast('✓ Responses submitted successfully');
+  }catch(e){showToast('⚠ Could not reach Google Forms',true);}
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+renderQuestion(1);
+updatePalette();
+</script>
+</body>
+</html>
